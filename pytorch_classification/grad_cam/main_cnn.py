@@ -10,6 +10,7 @@ from utils import GradCAM, show_cam_on_image, center_crop_img
 
 def main():
     model = models.mobilenet_v3_large(pretrained=True)
+    # 传入模型的最后一层进行可视化研究
     target_layers = [model.features[-1]]
 
     # model = models.vgg16(pretrained=True)
