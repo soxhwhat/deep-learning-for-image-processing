@@ -1,4 +1,5 @@
 import os
+import sys
 import json
 
 import torch
@@ -62,7 +63,7 @@ def main():
     # download url: https://download.pytorch.org/models/resnet34-333f7ec4.pth
     model_weight_path = "./resnet34-pre.pth"
     assert os.path.exists(model_weight_path), "file {} does not exist.".format(model_weight_path)
-    net.load_state_dict(torch.load(model_weight_path, map_location=device))
+    net.load_state_dict(torch.load(model_weight_path, map_location='cpu'))
     # for param in net.parameters():
     #     param.requires_grad = False
 
@@ -86,7 +87,7 @@ def main():
         # train
         net.train()
         running_loss = 0.0
-        train_bar = tqdm(train_loader)
+        train_bar = tqdm(train_loader, file=sys.stdout)
         for step, data in enumerate(train_bar):
             images, labels = data
             optimizer.zero_grad()
@@ -106,7 +107,7 @@ def main():
         net.eval()
         acc = 0.0  # accumulate accurate number / epoch
         with torch.no_grad():
-            val_bar = tqdm(validate_loader)
+            val_bar = tqdm(validate_loader, file=sys.stdout)
             for val_data in val_bar:
                 val_images, val_labels = val_data
                 outputs = net(val_images.to(device))

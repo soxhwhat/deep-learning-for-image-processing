@@ -6,15 +6,16 @@ from PIL import Image
 from torchvision import transforms
 import matplotlib.pyplot as plt
 
-from model import swin_small_patch4_window7_224 as create_model
+from model import swin_tiny_patch4_window7_224 as create_model
 
 
 def main():
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
+    img_size = 224
     data_transform = transforms.Compose(
-        [transforms.Resize(256),
-         transforms.CenterCrop(224),
+        [transforms.Resize(int(img_size * 1.14)),
+         transforms.CenterCrop(img_size),
          transforms.ToTensor(),
          transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])
 
@@ -32,8 +33,8 @@ def main():
     json_path = './class_indices.json'
     assert os.path.exists(json_path), "file: '{}' dose not exist.".format(json_path)
 
-    json_file = open(json_path, "r")
-    class_indict = json.load(json_file)
+    with open(json_path, "r") as f:
+        class_indict = json.load(f)
 
     # create model
     model = create_model(num_classes=5).to(device)
@@ -50,7 +51,9 @@ def main():
     print_res = "class: {}   prob: {:.3}".format(class_indict[str(predict_cla)],
                                                  predict[predict_cla].numpy())
     plt.title(print_res)
-    print(print_res)
+    for i in range(len(predict)):
+        print("class: {:10}   prob: {:.3}".format(class_indict[str(i)],
+                                                  predict[i].numpy()))
     plt.show()
 
 
